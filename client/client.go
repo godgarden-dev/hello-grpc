@@ -6,21 +6,21 @@ import (
 	"os"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 
 	pb "github.com/kancers/hello-grpc"
 )
 
 func main() {
 	addr := "localhost:50051"
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	creds, err := credentials.NewClientTLSFromFile("server.crt", "")
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(creds))
 	defer conn.Close()
 	c := pb.NewGreeterClient(conn)
-
 	name := os.Args[1]
-
 	ctx := context.Background()
 	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: name})
 	if err != nil {
