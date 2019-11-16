@@ -1,0 +1,33 @@
+---
+version: 2
+
+defaults: &defaults
+  working_directory: /go/src/github.com/kancers/hello-grpc
+
+jobs:
+  build:
+    <<: *defaults
+    docker:
+      - image: golang:1.13-stretch
+    steps:
+      - checkout
+      - run:
+          name: Run test
+          command: |
+            make test
+  lint:
+    <<: *defaults
+    docker:
+      - image: golang:1.13-stretch
+    steps:
+      - checkout
+      - run:
+          name: Run lint
+          command: |
+            make lint
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build
+      - lint
