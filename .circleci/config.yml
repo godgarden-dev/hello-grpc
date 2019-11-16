@@ -5,7 +5,7 @@ defaults: &defaults
   working_directory: /go/src/github.com/kancers/hello-grpc
 
 jobs:
-  build:
+  test:
     <<: *defaults
     docker:
       - image: golang:1.13-stretch
