@@ -1,33 +1,70 @@
 ---
-version: 2
-
-defaults: &defaults
-  working_directory: /go/src/github.com/kancers/hello-grpc
+version: 2.1
+executors:
+  default:
+    docker:
+      - image: circleci/golang:1.13
+        user: root
+    working_directory: /go/src/github.com/kancers/hello-grpc
+    environment:
+      - GO111MODULE: "on"
 
 jobs:
-  test:
-    <<: *defaults
-    docker:
-      - image: golang:1.13-stretch
+  setup:
+    executor:
+      name: default
     steps:
       - checkout
+      - restore_cache:
+          name: Restore go modules cache
+          keys:
+            - go-modules-{{ .Branch }}-{{ checksum "go.mod" }}
+      - run:
+          name: golangci-lint
+          command: |
+            curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
+      - run:
+          name: Vendoring
+          command: go mod download
+      - save_cache:
+          name: Save go modules cache
+          key: go-modules-{{ .Branch }}-{{ checksum "go.mod" }}
+          paths:
+            - /go/pkg/mod/cache
+      - persist_to_workspace:
+          root: /go
+          paths:
+            - src
+            - bin
+            - pkg/mod/cache
+
+  test:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: /go
       - run:
           name: Run test
-          command: |
-            make test
+          command: make test
+
   lint:
-    <<: *defaults
-    docker:
-      - image: golang:1.13-stretch
+    executor:
+      name: default
     steps:
-      - checkout
+      - attach_workspace:
+          at: /go
       - run:
           name: Run lint
-          command: |
-            make lint
+          command: make lint
+
 workflows:
-  version: 2
-  build-workflow:
+  build-and-test:
     jobs:
-      - build
-      - lint
+      - setup
+      - test:
+          requires:
+            - setup
+      - lint:
+          requires:
+            - setup
