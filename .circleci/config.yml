@@ -5,7 +5,7 @@ executors:
     docker:
       - image: circleci/golang:1.13
         user: root
-    working_directory: /go/src/github.com/kancers/hello-grpc
+    working_directory: /go/src/github.com/kancers/hello-grpc/backend
     environment:
       - GO111MODULE: "on"
 
@@ -46,7 +46,7 @@ jobs:
           at: /go
       - run:
           name: Run test
-          command: cd ./backend/; && make test
+          command: make test
 
   lint:
     executor:
@@ -56,7 +56,7 @@ jobs:
           at: /go
       - run:
           name: Run lint
-          command: cd ./backend/; && make lint
+          command: make lint
 
 workflows:
   test-and-lint:
