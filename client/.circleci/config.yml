@@ -59,7 +59,7 @@ jobs:
           command: make lint
 
 workflows:
-  build-and-test:
+  test-and-lint:
     jobs:
       - setup
       - test:
