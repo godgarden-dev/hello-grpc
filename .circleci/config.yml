@@ -20,7 +20,7 @@ jobs:
           keys:
             - go-modules-{{ .Branch }}-{{ checksum "go.mod" }}
       - run:
-          name: golangci-lint
+          name: download golangci-lint
           command: |
             curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run:
