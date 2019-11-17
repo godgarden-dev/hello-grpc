@@ -46,7 +46,7 @@ jobs:
           at: /go
       - run:
           name: Run test
-          command: ./backend/make test
+          command: cd ./backend/; && make test
 
   lint:
     executor:
@@ -56,7 +56,7 @@ jobs:
           at: /go
       - run:
           name: Run lint
-          command: ./backend/make lint
+          command: cd ./backend/; && make lint
 
 workflows:
   test-and-lint:
