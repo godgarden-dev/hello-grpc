@@ -5,12 +5,10 @@ executors:
     docker:
       - image: circleci/golang:1.13
         user: root
-    working_directory: /go/src/github.com/kancers/hello-grpc/backend
-    environment:
-      - GO111MODULE: "on"
+    working_directory: /go/src/github.com/kancers/hello-grpc
 
 jobs:
-  setup:
+  go_setup:
     executor:
       name: default
     steps:
@@ -18,17 +16,17 @@ jobs:
       - restore_cache:
           name: Restore go modules cache
           keys:
-            - go-modules-{{ .Branch }}-{{ checksum "go.mod" }}
+            - v1-go-modules-{{ .Branch }}-{{ checksum "backend/go.mod" }}
       - run:
           name: download golangci-lint
           command: |
             curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
       - run:
           name: Vendoring
-          command: go mod download
+          command: cd ./backend && go mod download
       - save_cache:
           name: Save go modules cache
-          key: go-modules-{{ .Branch }}-{{ checksum "go.mod" }}
+          key: v1-go-modules-{{ .Branch }}-{{ checksum "backend/go.mod" }}
           paths:
             - /go/pkg/mod/cache
       - persist_to_workspace:
@@ -38,7 +36,7 @@ jobs:
             - bin
             - pkg/mod/cache
 
-  test:
+  go_test:
     executor:
       name: default
     steps:
@@ -46,9 +44,9 @@ jobs:
           at: /go
       - run:
           name: Run test
-          command: make test
+          command: cd ./backend && make test
 
-  lint:
+  go_lint:
     executor:
       name: default
     steps:
@@ -56,15 +54,15 @@ jobs:
           at: /go
       - run:
           name: Run lint
-          command: make lint
+          command: cd ./backend && make lint
 
 workflows:
   test-and-lint:
     jobs:
-      - setup
-      - test:
+      - go_setup
+      - go_test:
           requires:
-            - setup
-      - lint:
+            - go_setup
+      - go_lint:
           requires:
-            - setup
+            - go_setup
