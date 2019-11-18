@@ -19,7 +19,6 @@ func main() {
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(unaryInterceptor))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
-
 	}
 	defer conn.Close()
 
