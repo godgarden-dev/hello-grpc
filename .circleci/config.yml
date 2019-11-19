@@ -6,9 +6,8 @@ executors:
       - image: circleci/golang:1.13
         user: root
     working_directory: /go/src/github.com/kancers/hello-grpc
-
 jobs:
-  go_setup:
+  setup:
     executor:
       name: default
     steps:
@@ -39,7 +38,7 @@ jobs:
             - bin
             - pkg/mod/cache
 
-  go_test:
+  test:
     executor:
       name: default
     steps:
@@ -49,7 +48,7 @@ jobs:
           name: Run test
           command: cd ./backend && make test
 
-  go_lint:
+  lint:
     executor:
       name: default
     steps:
@@ -62,10 +61,10 @@ jobs:
 workflows:
   test-and-lint:
     jobs:
-      - go_setup
-      - go_test:
+      - setup
+      - test:
           requires:
-            - go_setup
+            - setup
       - go_lint:
           requires:
-            - go_setup
+            - setup
