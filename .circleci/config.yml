@@ -39,7 +39,7 @@ jobs:
             - bin
             - pkg/mod/cache
 
-  test:
+  go_test:
     executor:
       name: default
     steps:
@@ -49,7 +49,7 @@ jobs:
           name: Run test
           command: cd ./backend && make test
 
-  lint:
+  go_lint:
     executor:
       name: default
     steps:
@@ -63,9 +63,9 @@ workflows:
   test-and-lint:
     jobs:
       - setup
-      - test:
+      - go_test:
           requires:
             - setup
-      - lint:
+      - go_lint:
           requires:
             - setup
