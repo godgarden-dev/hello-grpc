@@ -65,6 +65,6 @@ workflows:
       - test:
           requires:
             - setup
-      - go_lint:
+      - lint:
           requires:
             - setup
