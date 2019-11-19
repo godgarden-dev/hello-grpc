@@ -14,8 +14,8 @@ jobs:
     steps:
       - checkout
       - run:
-        -name: Get Cache Checksum
-        - command: ls -la backend/go.mod > deps_checksum
+          name: Get Cache Checksum
+          command: ls -la backend/go.mod > deps_checksum
       - restore_cache:
           name: Restore go modules cache
           keys:
