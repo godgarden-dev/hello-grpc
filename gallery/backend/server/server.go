@@ -2,20 +2,19 @@ package main
 
 import (
 	"context"
+	"github.com/kancers/hello-grpc/backend"
 	"log"
 	"net"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-
-	pb "github.com/kancers/hello-grpc"
 )
 
 type server struct{}
 
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+func (s *server) SayHello(ctx context.Context, in *backend.HelloRequest) (*backend.HelloReply, error) {
 	log.Printf("Received: %v", in.Name)
-	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
+	return &backend.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
 func main() {
@@ -29,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 	s := grpc.NewServer(grpc.Creds(cred))
-	pb.RegisterGreeterServer(s, &server{})
+	backend.RegisterGreeterServer(s, &server{})
 	log.Printf("gRPC server listening on " + addr)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

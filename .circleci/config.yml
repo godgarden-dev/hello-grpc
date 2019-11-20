@@ -1,0 +1,67 @@
+---
+version: 2.1
+executors:
+  default:
+    docker:
+      - image: circleci/golang:1.13
+        user: root
+    working_directory: /go/src/github.com/kancers/hello-grpc
+jobs:
+  go_setup:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore go modules cache
+          keys:
+            - v1-go-mod-{{ .Branch }}-{{ checksum "gallery/backend/go.mod" }}
+      - run:
+          name: download golangci-lint
+          # yamllint disable-line rule:line-length
+          command: curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
+      - run:
+          name: Vendoring
+          command: cd ./gallery/backend && go mod download
+      - save_cache:
+          name: Save go modules cache
+          key: v1-go-mod-{{ .Branch }}-{{ checksum "gallery/backend/go.mod" }}
+          paths:
+            - /go/pkg/mod/cache
+      - persist_to_workspace:
+          root: /go
+          paths:
+            - src
+            - bin
+            - pkg/mod/cache
+
+  go_test:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: /go
+      - run:
+          name: Run test
+          command: cd ./gallery/backend && make test
+
+  go_lint:
+    executor:
+      name: default
+    steps:
+      - attach_workspace:
+          at: /go
+      - run:
+          name: Run lint
+          command: cd ./gallery/backend && make lint
+
+workflows:
+  test-and-lint:
+    jobs:
+      - go_setup
+      - go_test:
+          requires:
+            - go_setup
+      - go_lint:
+          requires:
+            - go_setup

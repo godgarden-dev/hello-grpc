@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
+	"github.com/kancers/hello-grpc/backend"
 	"log"
 	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-
-	pb "github.com/kancers/hello-grpc"
 )
 
 func main() {
@@ -18,12 +17,15 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(creds), grpc.WithUnaryInterceptor(unaryInterceptor))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
 	defer conn.Close()
 
-	c := pb.NewGreeterClient(conn)
+	c := backend.NewGreeterClient(conn)
 	name := os.Args[1]
 	ctx := context.Background()
-	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: name})
+	r, err := c.SayHello(ctx, &backend.HelloRequest{Name: name})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
