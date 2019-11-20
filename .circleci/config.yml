@@ -21,8 +21,8 @@ jobs:
             - v1-go-mod-{{ .Branch }}-{{ checksum "deps_checksum" }}
       - run:
           name: download golangci-lint
-          command: curl -sfL \
-            https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
+          command: |
+            curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s v1.21.0
       - run:
           name: Vendoring
           command: cd ./backend && go mod download
