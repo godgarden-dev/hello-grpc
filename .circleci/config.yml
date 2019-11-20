@@ -12,13 +12,10 @@ jobs:
       name: default
     steps:
       - checkout
-      - run:
-          name: Get Cache Checksum
-          command: ls -la backend/go.mod > deps_checksum
       - restore_cache:
           name: Restore go modules cache
           keys:
-            - v1-go-mod-{{ .Branch }}-{{ checksum "deps_checksum" }}
+            - v1-go-mod-{{ .Branch }}-{{ checksum "backend/go.mod" }}
       - run:
           name: download golangci-lint
           command: |
@@ -30,7 +27,7 @@ jobs:
           command: cd ./backend && go mod download
       - save_cache:
           name: Save go modules cache
-          key: v1-go-mod-{{ .Branch }}-{{ checksum "deps_checksum" }}
+          key: v1-go-mod-{{ .Branch }}-{{ checksum "backend/go.mod" }}
           paths:
             - /go/pkg/mod/cache
       - persist_to_workspace:
